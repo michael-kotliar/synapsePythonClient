@@ -538,8 +538,83 @@ class Schema(Entity, Versionable):
                 self.properties.columnIds.append(column.id)
             self.__dict__['columns_to_store'] = None
 
-class ViewSchema(Schema):
+_synapse_property__column_ids = ['2510', '23543', '23544', '23545', '31783', '26823', '31784', '23550',
+                                 '30514', '31785', '31782', '31786']
+
+class ViewSchema(Entity):
     _synapse_entity_type = 'org.sagebionetworks.repo.model.table.EntityView'
+    _property_keys = Entity._property_keys + Versionable._property_keys + ['columnIds', 'scopeIds', 'type']
+    _local_keys = Entity._local_keys + ['columns_to_store', 'scopes_to_store']
+
+    def __init__(self, name=None, scopeIds=None, columns=[], setPropertyCols=True, parent=None, properties=None, annotations=None, local_state=None, **kwargs):
+        self.properties.setdefault('type', 'file')
+        if setPropertyCols:
+            self.properties.setdefault('columnIds',_synapse_property__column_ids)
+        else:
+            self.properties.setdefault('columnIds', [])
+        self.properties.setdefault('scopeIds',[])
+        if name: kwargs['name'] = name
+        if columns:
+            for column in columns:
+                if isinstance(column, six.string_types) or isinstance(column, int) or hasattr(column, 'id'):
+                    kwargs.setdefault('columnIds',[]).append(utils.id_of(column))
+                elif isinstance(column, Column):
+                    kwargs.setdefault('columns_to_store',[]).append(column)
+                else:
+                    raise ValueError("Not a column? %s" % str(column))
+        if scopeIds:
+            for scopeId in scopeIds:
+                if utils.is_synapse_id(scopeId):
+                    tmp_id = utils.id_of(scopeId)
+                    # This should be temporary - backend should accept syn123
+                    kwargs.setdefault('scopeIds',[]).append(tmp_id.lstrip('syn'))
+                else:
+                    raise ValueError("Not a Synapse Entity? %s" % str(scopeId))
+        super(ViewSchema, self).__init__(concreteType=ViewSchema._synapse_entity_type, properties=properties,
+                                         annotations=annotations, local_state=local_state, parent=parent, **kwargs)
+
+    def addColumn(self, column):
+        """
+        :param column: a column object or its ID
+        """
+        if isinstance(column, six.string_types) or isinstance(column, int) or hasattr(column, 'id'):
+            self.properties.columnIds.append(utils.id_of(column))
+        elif isinstance(column, Column):
+            if not self.__dict__.get('columns_to_store', None):
+                self.__dict__['columns_to_store'] = []
+            self.__dict__['columns_to_store'].append(column)
+        else:
+            raise ValueError("Not a column? %s" % str(column))
+
+    def addColumns(self, columns):
+        """
+        :param columns: a list of column objects or their ID
+        """
+        for column in columns:
+            self.addColumn(column)
+
+    def removeColumn(self, column):
+        """
+        :param column: a column object or its ID
+        """
+        if isinstance(column, six.string_types) or isinstance(column, int) or hasattr(column, 'id'):
+            self.properties.columnIds.remove(utils.id_of(column))
+        elif isinstance(column, Column) and self.columns_to_store:
+            self.columns_to_store.remove(column)
+        else:
+            ValueError("Can't remove column %s" + str(column))
+
+    def has_columns(self):
+        """Does this schema have columns specified?"""
+        return bool(self.properties.get('columnIds',None) or self.__dict__.get('columns_to_store',None))
+
+    def _before_synapse_store(self, syn):
+        ## store any columns before storing table
+        if self.columns_to_store:
+            for column in self.columns_to_store:
+                column = syn.store(column)
+                self.properties.columnIds.append(column.id)
+            self.__dict__['columns_to_store'] = None
 
 ## add Schema to the map of synapse entity types to their Python representations
 synapseclient.entity._entity_type_to_class[Schema._synapse_entity_type] = Schema
