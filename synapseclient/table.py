@@ -541,7 +541,7 @@ class Schema(Entity, Versionable):
 _synapse_property__column_ids = ['2510', '23543', '23544', '23545', '31783', '26823', '31784', '23550',
                                  '30514', '31785', '31782', '31786']
 
-class ViewSchema(Entity):
+class EntityView(Entity):
     _synapse_entity_type = 'org.sagebionetworks.repo.model.table.EntityView'
     _property_keys = Entity._property_keys + Versionable._property_keys + ['columnIds', 'scopeIds', 'type']
     _local_keys = Entity._local_keys + ['columns_to_store', 'scopes_to_store']
@@ -570,7 +570,7 @@ class ViewSchema(Entity):
                     kwargs.setdefault('scopeIds',[]).append(tmp_id.lstrip('syn'))
                 else:
                     raise ValueError("Not a Synapse Entity? %s" % str(scopeId))
-        super(ViewSchema, self).__init__(concreteType=ViewSchema._synapse_entity_type, properties=properties,
+        super(EntityView, self).__init__(concreteType=EntityView._synapse_entity_type, properties=properties,
                                          annotations=annotations, local_state=local_state, parent=parent, **kwargs)
 
     def addColumn(self, column):
@@ -618,7 +618,7 @@ class ViewSchema(Entity):
 
 ## add Schema to the map of synapse entity types to their Python representations
 synapseclient.entity._entity_type_to_class[Schema._synapse_entity_type] = Schema
-synapseclient.entity._entity_type_to_class[ViewSchema._synapse_entity_type] = ViewSchema
+synapseclient.entity._entity_type_to_class[EntityView._synapse_entity_type] = EntityView
 
 
 ## allowed column types

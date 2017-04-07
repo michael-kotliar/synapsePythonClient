@@ -82,7 +82,7 @@ from .activity import Activity
 from .entity import Entity, File, Project, Folder, Link, Versionable, split_entity_namespaces, is_versionable, is_container, is_synapse_entity
 from .dict_object import DictObject
 from .evaluation import Evaluation, Submission, SubmissionStatus
-from .table import Schema, ViewSchema, Table, Column, RowSet, Row, TableQueryResult, CsvFileTable
+from .table import Schema, EntityView, Table, Column, RowSet, Row, TableQueryResult, CsvFileTable
 from .team import UserProfile, Team, TeamMember, UserGroupHeader
 from .wiki import Wiki, WikiAttachment
 from .retry import _with_retry
@@ -2240,7 +2240,7 @@ class Synapse:
         :param name:       A name for this submission
         :param team:       (optional) A :py:class:`Team` object or name of a Team that is registered
                            for the challenge
-        :param submitterAlias: (optional) A nickname, possibly for display in leaderboards in place 
+        :param submitterAlias: (optional) A nickname, possibly for display in leaderboards in place
                            of the submitter's name
         :param teamName: (deprecated) A synonym for submitterAlias
 
