@@ -640,8 +640,8 @@ def printTransferProgress(transferred, toBeTransferred, prefix = '', postfix='',
     :param previouslyTransferred: the number of bytes that were already transferred before this transfer began( e.g. someone ctrl+c'd out of an upload and restarted it later)
 
     """
-    if not sys.stdout.isatty():
-        return 
+    # if not sys.stdout.isatty():
+    #     return
     barLength = 20 # Modify this to change the length of the progress bar
     status = ''
     rate = ''
