@@ -676,7 +676,7 @@ def printTransferProgress(transferred, toBeTransferred, prefix = '', postfix='',
                                                   nbytes, outOf, rate,
                                                   postfix, status)
     sys.stderr.write(text)
-    sys.stdout.flush()
+    sys.stderr.flush()
 
 
 def humanizeBytes(bytes):
