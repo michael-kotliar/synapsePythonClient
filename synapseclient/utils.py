@@ -675,7 +675,7 @@ def printTransferProgress(transferred, toBeTransferred, prefix = '', postfix='',
                                                   percentage, 
                                                   nbytes, outOf, rate,
                                                   postfix, status)
-    sys.stdout.write(text)
+    sys.stderr.write(text)
     sys.stdout.flush()
 
 
